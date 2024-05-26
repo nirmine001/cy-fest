@@ -1,21 +1,21 @@
-#include "modefestivalier.h"
-#include "couleurs.h" 
+#include "modefestivalgoer.h"
+#include "couleurs.h"  
 
 
 int main (){
-    char mode = 0; //initialisée à 0. Elle servira à stocker le choix de l'utilisateur.
+    char mode = 0; //Set to 0. This will be used to store the user's choice.
     ConcertHall *hall = NULL;
     int nbrh;
     Concert *h = NULL;
 
-    while (1){ //boucle qui tourne indéfiniment. L'expression 1 est toujours vraie
+    while (1){ //loop that rotates indefinitely. Expression 1 is always true
         do{
         printf("choose the mode : (1 for MANAGER, 2 for FESTIVAL-GOER, 3 to Exit): ");
         scanf (" %c", &mode); 
         }while (mode != '1' && mode != '2' && mode !='3');
         
         if (mode == '3'){
-            break; //quitter programme
+            break; 
         }	
         else if (mode == '1'){
             printf("\nYou are in MANAGER mode.\n");
@@ -53,7 +53,7 @@ int main (){
     
     if (hall) {
         for (int i = 0; i < nbrh; i++) {
-            free(hall[i].seats_per_row); // En laissant la libération de la mémoire à l'appelant, cela clarifie les responsabilités
+            free(hall[i].seats_per_row); // Leaving memory release to the caller clarifies responsibilities
         }
         free(hall);
     }
