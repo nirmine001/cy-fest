@@ -1,0 +1,13 @@
+CC = gcc
+EXEC = prog
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o) # SRC mais on remplace .c par .o
+
+all : $(EXEC) # fait référence à main.o modefestivalgoer.o modeManager_CreationConcert.o modeManager_CreationSalle.o
+
+$(EXEC) : $(OBJ)   # main.o modefestivalgoer.o modeManager_CreationConcert.o
+modeManager_CreationHall.o
+	$(CC) -o $@ $^ # main.o modefestivalgoer.o modeManager_CreationConcert.o modeManager_CreationHall.o
+
+%.o : %.c
+	$(CC) -o $@ -c $<
