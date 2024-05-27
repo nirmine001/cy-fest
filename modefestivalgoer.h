@@ -9,7 +9,7 @@ typedef struct{
     char C;
 }Category;
 
-void viewConcertsAvailable(const Concert [], int ); 
+void viewConcertsAvailable(Concert [], int ); 
 void book_a_spot(Concert []);
 void printfMODEFESTIVALIER(int );
 
