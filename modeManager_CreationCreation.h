@@ -20,7 +20,7 @@ typedef struct {
     int stateSeat[SIZE][SIZE];
 }Concert;
 
-ConcertHall readHallInfoFromFile(const char* , const char* );
+ConcertHall readHallInfoFromFile(char* , char* );
 void handleExistingHalls(Concert * );
 void create_Concert(Concert *);
 void print_featuresConcert(Concert * );
@@ -30,6 +30,6 @@ int is_concert_over(Concert* );
 void check_satisfaction2(Concert * , char );
 void printCREATION_CONCERT(Concert* );
 void save_to_file2(Concert );
-Concert readConcertInfoFromFile(const char* , const char* );
+Concert readConcertInfoFromFile(char* , char* );
 
 #endif
