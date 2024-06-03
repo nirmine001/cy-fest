@@ -2,37 +2,36 @@
 #include "couleurs.h"
 // creation of the concert hall 
 
-ConcertHall readHallInfoFromFile(const char* filename, const char* hallName) {
+ConcertHall readHallInfoFromFile(char* filename, char* hallName) {
     ConcertHall hall;
     FILE* file = fopen(filename, "r");
-    if (file != NULL) {
-        char buffer[SIZE];
-        // read line per line until the end of file
-        while (fgets(buffer, SIZE, file) != NULL) {
-            // Verify if the line contains the name of the hall
-            if (sscanf(buffer, "Name of the hall: %s\n", hall.name) == 1) {
-                if (strcmp(hall.name, hallName) == 0) {
-                    fscanf(file, "Number of rows: %d\n", &hall.num_rows);
-                    fscanf(file, "Choice of configuration : %c\n", &hall.choice);
-                    if (hall.choice == '1') {
-                        fscanf(file, "Number of seats per row: %d\n", &hall.seats_per_row[0]);
-                    } else {
-                        for (int i = 0; i < hall.num_rows; i++) {
-                            fscanf(file, "- R%d: %d seats\n", &i + 1, &hall.seats_per_row[i]);
-                        }
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return hall;
+    }
+    char buffer[SIZE];
+    while (fgets(buffer, SIZE, file) != NULL) { // read line per line until the end of file
+        if (sscanf(buffer, "Name of the hall: %s\n", hall.name) == 1) { // Verify if the line contains the name of the hall
+            if (strcmp(hall.name, hallName) == 0) {
+                fscanf(file, "Number of rows: %d\n", &hall.num_rows);
+                fscanf(file, "Choice of configuration : %c\n", &hall.choice);
+                if (hall.choice == '1') {
+                    fscanf(file, "Number of seats per row: %d\n", &hall.seats_per_row[0]);
+                } else {
+                    for (int i = 0; i < hall.num_rows; i++) {
+                        fscanf(file, "- R%d: %d seats\n", &i + 1, &hall.seats_per_row[i]);
                     }
-                    fscanf(file, "Number of rows in each category (A,B,C): %d, %d, %d\n", &hall.A_rows, &hall.B_rows, &hall.C_rows);
-                    fscanf(file, "Number of seats in each category (A,B,C): %d, %d, %d\n", &hall.seats_in_catA, &hall.seats_in_catB, &hall.seats_in_catC);
-                    fscanf(file, "Ticket prices for each category (A,B,C): %g$, %g$, %g$\n", &hall.prices[0], &hall.prices[1], &hall.prices[2]);
-                    fclose(file);
-                    return hall;
                 }
+                fscanf(file, "Number of rows in each category (A,B,C): %d, %d, %d\n", &hall.A_rows, &hall.B_rows, &hall.C_rows);
+                fscanf(file, "Number of seats in each category (A,B,C): %d, %d, %d\n", &hall.seats_in_catA, &hall.seats_in_catB, &hall.seats_in_catC);
+                fscanf(file, "Ticket prices for each category (A,B,C): %g$, %g$, %g$\n", &hall.prices[0], &hall.prices[1], &hall.prices[2]);
+                
+                fclose(file);
+                return hall;
             }
         }
-        fclose(file);
-    } else {
-        printf("Error opening file.\n");
     }
+    fclose(file);
     return hall;
 }
 
@@ -81,9 +80,9 @@ void handleExistingHalls(Concert *c) {
         } 
     } while (found == 0);
 }
-    
+
 void create_Concert(Concert *c){
-    printf("You will start to give the features of the concert: \n");
+    printf("\nYou will start to give the features of the concert: \n");
 
     printf("\nEnter the the name of the artist performing : (please use - instead of space)\n");
     scanf("%s", c->artist);
@@ -126,16 +125,15 @@ void create_Concert(Concert *c){
         printf("\n");
     }
     }while (c->choice !='1' && c->choice !='2');
-     printf("Salle assignée au concert : %s\n", c->hall);
 
     do {
     printf("\nDoes it has a pit ? (0 for no, 1 for yes) : \n");
     scanf(" %c", &c->pit);
     }while (c->pit != '0' && c->pit != '1');
-    
+
 }
 void print_featuresConcert(Concert *c){
-    printf("\nArtist: %s, Starting time: (%d:%d), Ending time: (%d:%d), Hall %s assigned to this concert.\n", c->artist,c->start_hour, c->start_minute, c->end_hour, c->end_minute, c->hall);
+    printf("\n Artist: %s, Starting time: (%d:%d), Ending time: (%d:%d), Hall %s assigned to this concert.\n", c->artist,c->start_hour, c->start_minute, c->end_hour, c->end_minute, c->hall);
     if(c->pit=='0'){
         printf(" No pit during the concert.\n");
     }
@@ -143,10 +141,10 @@ void print_featuresConcert(Concert *c){
         ConcertHall hall;
         hall = readHallInfoFromFile("hallinfo.txt", c->hall);
         // The location of a seat can contain the space of 2 festival goer.
+        /*printf("Nombre de sieges dans A : %d\n", hall.seats_in_catA);*/
         int r = hall.seats_in_catA;
         r= r*2;
         c->placepit = r;
-        printf("Nombre de sieges dans A : %d\n", hall.seats_in_catA);
         printf(" Your concert includes a pit. Therefore, there is no cat A, but the price is the same\n");
         printf (" It will have %d places in the pit.\n",c->placepit); 
     }
@@ -155,7 +153,7 @@ void print_featuresConcert(Concert *c){
 void modify (ConcertHall* m, Concert *c){
     ConcertHall h;
     h = readHallInfoFromFile("hallinfo.txt", c->hall);
-    
+
     printf("Old prices for each category (A,B,C): %g$, %g$, %g$\n", h.prices[0], h.prices[1], h.prices[2]);
     printf("\nGive the new price...\n");
     do{
@@ -182,41 +180,48 @@ void modify (ConcertHall* m, Concert *c){
       printf ("... for cat B: ");
       scanf ("%d", &m->B_rows);
    }while (m->B_rows < 0 || m->B_rows > h.num_rows);
+    /*
     do {
         printf("\nDoes it has a pit ? (0 for no, 1 for yes) : \n");
         scanf(" %c", &c->pit);
-    }while (c->pit != '0' && c->pit != '1');
+    }while (c->pit != '0' && c->pit != '1'); */
 
     int s=m->A_rows+m->B_rows;
     int r = h.num_rows;
     if (s < r){
         m->C_rows = r-s;
     }
+    h.seats_per_row = (int *)malloc(h.num_rows * sizeof(int)); //In C, malloc returns a void * pointer (generic pointer), and needs to be converted to the appropriate pointer type, in this case a pointer to an integer (int *).
+    if (h.seats_per_row == NULL) {                           
+        printf("Memorry allocation problem !\n");
+        exit(1);
+    }
    if (h.choice=='1'){
-       m->seats_in_catA = m->A_rows * m->seats_per_row[0];
-       m->seats_in_catB = m->B_rows * m->seats_per_row[0];
-       m->seats_in_catC = m->C_rows * m->seats_per_row[0];
+       m->seats_in_catA = m->A_rows * h.seats_per_row[0];
+       m->seats_in_catB = m->B_rows * h.seats_per_row[0];
+       m->seats_in_catC = m->C_rows * h.seats_per_row[0];
    }
    else {
        int i;
        int r=0;
        for (i=0; i<m->A_rows; i++) { 
-              r = r+m->seats_per_row[i] ; 
+              r = r+h.seats_per_row[i] ; 
           } 
           m->seats_in_catA = r;
        for (i=m->A_rows; i < m->A_rows + m->B_rows; i++) {
-           r +=m->seats_per_row[i];
+           r +=h.seats_per_row[i];
        }
             m->seats_in_catB = r;
        for (i=m->A_rows + m->B_rows; i < s + m->C_rows; i++) { 
-              r += m->seats_per_row[i]; 
+              r += h.seats_per_row[i]; 
           }
           m->seats_in_catC = r;
    }
-    
+
     printf("\nNew price for cat: \n A : %g; \n B : %g; \n C : %g\n",m->prices[0], m->prices[1], m->prices[2]);
  printf("New number of rows in cat:\n A : %d;\n B : %d;\n C : %d\n",m->A_rows, m->B_rows, m->C_rows);
     printf("Number of seats in each category:\n A : %d;\n B : %d;\n C : %d\n",m->seats_in_catA, m->seats_in_catB, m->seats_in_catC);
+
 }
 
 void modification(Concert * c, ConcertHall * m){
@@ -232,36 +237,44 @@ void modification(Concert * c, ConcertHall * m){
     printf("\nWould you like to modify it? (0 for no, 1 for yes)\n");
     scanf(" %c", &c->modification);
     if (c->modification == '1'){
+        ConcertHall *m = malloc(sizeof(ConcertHall));
+        Concert *c = malloc(sizeof(Concert));
+        if (m == NULL || c == NULL) {
+            printf("Erreur : Échec de l'allocation de mémoire.\n");
+            // Gérer l'échec de l'allocation, par exemple, en sortant de la fonction
+            return;
+        }
         modify(m,c);
-        ConcertHall hall;
-        save_to_file1(hall);
-    } else if (c->modification == '0'){ 
+        ConcertHall * hall;
+        save_to_file1(*hall);
+    }else if (c->modification == '0'){ 
         printf("No modification.\n");
     } else {
         printf("Error. Please choose beetween 1 and 0.\n");
     }
 }while(c->modification != '1' && c->modification != '0');
 } 
+
 int is_concert_over(Concert* e) {
     time_t current_time;
     struct tm *local_time;
-    // Obtain the current hour.
-    time(&current_time);
+    
+    time(&current_time); // Obtain the current hour.
     local_time = localtime(&current_time);
 
     int current_hour = local_time->tm_hour;
     int current_minute = local_time->tm_min;
 
-    if (current_hour > e->end_hour || (current_hour == e->end_hour && current_minute >= e->end_minute)) {
+    if (e->end_hour < current_hour  || (current_hour == e->end_hour && current_minute >= e->end_minute)) {
         e->is_ended = 1;
         printf("\nthe concert is ended.\n");
        ConcertHall *h;
         modification(e,h);
     } else {
         e->is_ended = 0;
-        printf("\nthe concert is not ended.\n");
+        /*printf("\nthe concert is not ended.\n"); */
     }
-    return e->is_ended;
+    return 0;
 }
 
 void check_satisfaction2(Concert *c, char creation){
@@ -293,25 +306,27 @@ void check_satisfaction2(Concert *c, char creation){
 } 
 
 void save_to_file2(Concert concert) {
-
+    ConcertHall hall = readHallInfoFromFile("hallinfo.txt", concert.hall);
+    concert.total_places = hall.seats_in_catA + hall.seats_in_catB + hall.seats_in_catC;
+    
     FILE *file = fopen("concertinfo.txt", "a+");
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
     }
-
     fprintf(file, "Name of the artist: %s\n", concert.artist);
     fprintf(file, "Starting time: (%d:%d)\n", concert.start_hour,concert.start_minute);
     fprintf(file, "Ending time: (%d:%d)\n", concert.end_hour,concert.end_minute);
     fprintf(file, "Has the concert ended?(1 yes,0 no): %d\n", concert.is_ended);
     fprintf(file, "Contain a pit? (1 yes, 0 no): %c\n", concert.pit);
-    fprintf(file, "Hall for the concert: %s\n", concert.hall);
     if (concert.is_ended==1){
         fprintf(file,"Has the concert hall been modified?(1 yes,0 no): %c\n",concert.modification);
     }
     if (concert.pit==1){
         fprintf(file, "Places in the pit: %d\n",concert.placepit);
     }
+    fprintf(file, "Hall for the concert: %s\n", concert.hall);
+    fprintf(file, "Total places: %d\n", concert.total_places);
     fclose(file);
 }
 
@@ -321,35 +336,38 @@ void printCREATION_CONCERT(Concert* c){
     save_to_file2(*c);
 }
 
-Concert readConcertInfoFromFile(const char* filename, const char* artistname) {
-    Concert concert;
+Concert readConcertInfoFromFile(char* filename, char* artistname) {
     FILE* file = fopen(filename, "r");
-    if (file != NULL) {
-        char buffer[SIZE];
-        // Read line by line until the end of file.
-        while (fgets(buffer, SIZE, file) != NULL) {
-            // Verify if the line contains the name of the hall.
-            if (sscanf(buffer, "Name of the artist: %s\n", concert.artist) == 1) {
-                if (strcmp(concert.artist, artistname) == 0) {
-                    fscanf(file, "Starting time: (%d:%d)\n", &concert.start_hour,&concert.start_minute);
-                    fscanf(file, "Ending time: (%d:%d)\n", &concert.end_hour,&concert.end_minute);
-                    fscanf(file, "Has the concert ended?(1 yes,0 no): %d\n", &concert.is_ended);
-                    fscanf(file, "Contain a pit? (1 yes, 0 no): %c\n", &concert.pit);
-                    fscanf(file, "Hall for the concert: %s\n", concert.hall);
-                    if (concert.is_ended==1){
-                        fscanf(file,"Has the concert hall been modified?(1 yes,0 no): %c\n",&concert.modification);
-                    }
-                    if (concert.pit==1){
-                        fscanf(file, "Places in the pit: %d\n",&concert.placepit);
-                    }
-                    fclose(file);
-                    return concert;
+    Concert concert = {0};
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return concert;
+    }
+    char buffer[SIZE];
+    while (fgets(buffer, SIZE, file) != NULL) {
+        printf("Line read: %s", buffer); //to see what it is reading IT WORKS
+
+        if (sscanf(buffer, "Name of the artist: %s\n", concert.artist) == 1) {
+            printf("Artist found: %s\n", concert.artist); 
+            if (strcmp(concert.artist, artistname) == 0) {
+                fscanf(file, "Starting time: (%d:%d)\n", &concert.start_hour,&concert.start_minute);
+                fscanf(file, "Ending time: (%d:%d)\n", &concert.end_hour,&concert.end_minute);
+                fscanf(file, "Has the concert ended?(1 yes,0 no): %d\n", &concert.is_ended);
+                fscanf(file, "Contain a pit? (1 yes, 0 no): %c\n", &concert.pit);
+                if (concert.is_ended==1){
+                    fscanf(file,"Has the concert hall been modified?(1 yes,0 no): %c\n",&concert.modification);
                 }
+                if (concert.pit==1){
+                    fscanf(file, "Places in the pit: %d\n",&concert.placepit);
+                }
+                fscanf(file, "Hall for the concert: %s\n", concert.hall);
+                fscanf(file, "Total places: %d\n", &concert.total_places);
+                
+                fclose(file);
+                return concert;
             }
         }
-        fclose(file);
-    } else {
-        printf("Error opening file.\n");
     }
+    fclose(file);
     return concert;
 }
